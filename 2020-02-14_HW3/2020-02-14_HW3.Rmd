@@ -24,6 +24,7 @@ curve(x^3 - 5*x^2 + x + 2, from = 0, to = 10)
   - Make 10 training sets. To make each training set, pick 15 random values of $x$ in the range. Generate 15 responses $f(x) + \epsilon$, with $\epsilon \sim \mathbb{N}(0,2)$. 
   
   
+## Produce training data, and resulting function values.
 ```{r}
 vecG <- c(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1)
 trainingData <- data.frame(id = vecG, stringsAsFactors=TRUE)
@@ -52,6 +53,33 @@ fun.1 <- function(x) x^3 - 5*x^2 + x + 2
 
 ```
 
+```{r}
+## Creating Testing Sets
+
+vecG <- c(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1)
+testingData <- data.frame(id = vecG, stringsAsFactors=TRUE)
+# Creating each testing set
+for (i in (1:10)){
+  
+  vecFx <- vector() # vector of random variables
+  vecX <- vector() # vector of randomly generated x
+  randEpsilon <- rnorm(15,0,2)
+  randX <- runif(15,0,10)
+  for(j in (1:15)){
+    
+    fx <- ((randX[j])^3) - (5*((randX[j])^2)) + randX[j] + 2 + randEpsilon[j]
+    
+    vecX[j] <- randX[j]
+    vecFx[j] <- fx
+  }
+  testingData <- cbind(testingData, data.frame(name = vecX))
+  testingData <- cbind(testingData, data.frame(name2 = vecFx))
+}
+colnames(testingData) <- c("dummy", "x1", "fx1", "x2", "fx2", "x3", "fx3", "x4", "fx4", "x5", "fx5", "x6", "fx6", "x7", "fx7", "x8", "fx8", "x9", "fx9", "x10", "fx10")
+testingData <- testingData[,-1]
+```
+
+
 ## Showing a sample plot
 
 ```{r}
@@ -69,9 +97,8 @@ dummyVec <- c(1,2,3,4,5)
 polynomialAvgs <- data.frame(id = dummyVec, stringsAsFactors=TRUE)
 ## Polynomial 1
 polyMSEs <- data.frame(id = dummyVec, stringsAsFactors=TRUE)
-
+modelDF <- data.frame(id = dummyVec, stringsAsFactors=TRUE)
 testMSEs <- c()
-trainedModels <- c()
 avgMSEs <- c()
 for (i in (1:10)){ # For each training set
 
@@ -84,24 +111,33 @@ for (i in (1:10)){ # For each training set
     lm.obj <- lm(trainingData[,(i*2)] ~ poly(trainingData[,i*2-1],k))
   
     # calculate the singlular training MSE for the model 
-    trainedModels <- append(trainedModels, lm.obj$fitted.values)  
     traingMSE <- mean((trainingData[,(i*2)] - lm.obj$fitted.values)^2)
     trainingMSEs <- append(trainingMSEs, traingMSE)
+    trainedModels <- append(trainedModels, lm.obj$fitted.values) 
+    
+    testMSEs <- c()
+    
+    
+    for (j in (1:10)){
+      
+      
+      
+    }
+    
+    
+    
   }
   
   polyMSEs <- cbind(polyMSEs, trainingMSEs)
-    
-    #for (j in (1:10)){ # For each testing set
-    
-      # Run the testing data set on the model
-      #linear.MSE <- mean((trainingData[,(i*2)] - predict(lm.obj,Auto.test))^2)
-      
-      # Calucluate the testing MSE
+
 }
 
 colnames(polyMSEs) <- c('degree','trainMSE1','trainMSE2','trainMSE3','trainMSE4','trainMSE5','trainMSE6','trainMSE7','trainMSE8','trainMSE9','trainMSE10')
 
 polyMSEs <- polyMSEs %>% mutate(avgMSE = Reduce("+",.)/length(.))
+
+# colnames(modelDF) <- c('degree','mod1','mod2','mod3','mod4','mod5','mod6','mod7','mod8','mod9','mod10')
+
 
 ```
 
