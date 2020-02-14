@@ -1,0 +1,114 @@
+---
+title: "Statistical Learning and Linear Regression"
+author: "Naeem Chowdhury"
+date: "2/14/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggplot2)
+```
+
+
+
+  1. Reproduce slide 18, using R markdown.
+  
+  - Let $f(x) = x^3 - 5x^2 + x + 2$. That's the truth. Draw $f(x)$ in range $x \in (0,10)$.
+  
+```{r}
+curve(x^3 - 5*x^2 + x + 2, from = 0, to = 10)
+```
+
+  - Make 10 training sets. To make each training set, pick 15 random values of $x$ in the range. Generate 15 responses $f(x) + \epsilon$, with $\epsilon \sim \mathbb{N}(0,2)$. 
+  
+  
+```{r}
+vecG <- c(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1)
+trainingData <- data.frame(id = vecG, stringsAsFactors=TRUE)
+# Creating each traing seet
+for (i in (1:10)){
+  
+  vecFx <- vector() # vector of random variables
+  vecX <- vector() # vector of randomly generated x
+  randEpsilon <- rnorm(15, 0, 2)
+  randX <- runif(15, 0, 10)
+  for(j in (1:15)){
+    
+    
+    fx <- ((randX[j])^3) - (5*((randX[j])^2)) + randX[j] + 2 + randEpsilon[j]
+    
+    vecX[j] <- randX[j]
+    vecFx[j] <- fx
+  }
+  trainingData <- cbind(trainingData, data.frame(name = vecX))
+  trainingData <- cbind(trainingData, data.frame(name2 = vecFx))
+}
+colnames(trainingData) <- c("dummy", "x1", "fx1", "x2", "fx2", "x3", "fx3", "x4", "fx4", "x5", "fx5", "x6", "fx6", "x7", "fx7", "x8", "fx8", "x9", "fx9", "x10", "fx10")
+trainingData <- trainingData[,-1]
+
+fun.1 <- function(x) x^3 - 5*x^2 + x + 2
+
+```
+
+## Showing a sample plot
+
+```{r}
+fun.1 <- function(x) x^3 - 5*x^2 + x + 2
+
+ggplot(data = trainingData, mapping = aes(x = x2, y = fx2)) + 
+  geom_point() +
+  stat_function(fun = fun.1) + xlim(0,10)
+  
+```
+
+```{r}
+## Creating Models and Calculating MSE for training and test
+dummyVec <- c(0,1)
+polynomialAvgs <- data.frame(id = dummyVec, stringsAsFactors=TRUE)
+## Polynomial 1
+poly1MSEs <- data.frame(id = dummyVec, stringsAsFactors=TRUE)
+trainingMSEs <- c()
+testMSEs <- c()
+avgMSEs <-
+for (i in (1:10)){ # For each training set
+  if (i %% 2 == 0){
+    next
+  }
+  else{
+    # build polynomial model 
+    xName <- paste("x",i, sep="")
+    fxName <- paste("fx",i, sep="")
+    lm.obj <- lm(trainingData[,(i+1)] ~ poly(trainingData[,i],1))
+    
+    # calculate the singlular training MSE for the model 
+    lm.obj$fitted.values 
+    traingMSE <- mean((trainingData[,(i+1)] - lm.obj$fitted.values)^2)
+    trainingMSEs <- append(trainingMSEs, traingMSE)
+    
+    
+    for (k in (1:5)){
+      
+    }
+      avgMSE <- mean(trainingMSEs)
+    
+    #for (j in (1:10)){ # For each testing set
+    
+      # Run the testing data set on the model
+      #linear.MSE <- mean((trainingData[,(i*2)] - predict(lm.obj,Auto.test))^2)
+      
+      # Calucluate the testing MSE
+  }
+      
+      
+  # }
+  
+}
+```
+
+
+
+
+  
+  
