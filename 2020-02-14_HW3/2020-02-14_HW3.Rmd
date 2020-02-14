@@ -1,6 +1,6 @@
 ---
 title: "Statistical Learning and Linear Regression"
-author: "Naeem Chowdhury"
+author: "Naeem Chowdhury and Simona Rahi"
 date: "2/14/2020"
 output: pdf_document
 ---
@@ -65,33 +65,31 @@ ggplot(data = trainingData, mapping = aes(x = x2, y = fx2)) +
 
 ```{r}
 ## Creating Models and Calculating MSE for training and test
-dummyVec <- c(0,1)
+dummyVec <- c(1,2,3,4,5)
 polynomialAvgs <- data.frame(id = dummyVec, stringsAsFactors=TRUE)
 ## Polynomial 1
-poly1MSEs <- data.frame(id = dummyVec, stringsAsFactors=TRUE)
-trainingMSEs <- c()
+polyMSEs <- data.frame(id = dummyVec, stringsAsFactors=TRUE)
+
 testMSEs <- c()
-avgMSEs <-
+trainedModels <- c()
+avgMSEs <- c()
 for (i in (1:10)){ # For each training set
-  if (i %% 2 == 0){
-    next
-  }
-  else{
-    # build polynomial model 
-    xName <- paste("x",i, sep="")
-    fxName <- paste("fx",i, sep="")
-    lm.obj <- lm(trainingData[,(i+1)] ~ poly(trainingData[,i],1))
-    
+
+  # build polynomial model 
+  xName <- paste("x",i, sep="")
+  fxName <- paste("fx",i, sep="")
+  trainingMSEs <- c()
+  
+  for (k in (1:5)){
+    lm.obj <- lm(trainingData[,(i*2)] ~ poly(trainingData[,i*2-1],k))
+  
     # calculate the singlular training MSE for the model 
-    lm.obj$fitted.values 
-    traingMSE <- mean((trainingData[,(i+1)] - lm.obj$fitted.values)^2)
+    trainedModels <- append(trainedModels, lm.obj$fitted.values)  
+    traingMSE <- mean((trainingData[,(i*2)] - lm.obj$fitted.values)^2)
     trainingMSEs <- append(trainingMSEs, traingMSE)
-    
-    
-    for (k in (1:5)){
-      
-    }
-      avgMSE <- mean(trainingMSEs)
+  }
+  
+  polyMSEs <- cbind(polyMSEs, trainingMSEs)
     
     #for (j in (1:10)){ # For each testing set
     
@@ -99,12 +97,12 @@ for (i in (1:10)){ # For each training set
       #linear.MSE <- mean((trainingData[,(i*2)] - predict(lm.obj,Auto.test))^2)
       
       # Calucluate the testing MSE
-  }
-      
-      
-  # }
-  
 }
+
+colnames(polyMSEs) <- c('degree','trainMSE1','trainMSE2','trainMSE3','trainMSE4','trainMSE5','trainMSE6','trainMSE7','trainMSE8','trainMSE9','trainMSE10')
+
+polyMSEs <- polyMSEs %>% mutate(avgMSE = Reduce("+",.)/length(.))
+
 ```
 
 
